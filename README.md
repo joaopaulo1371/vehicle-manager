@@ -1,88 +1,153 @@
-# Vehicle Manager - Desafio Full Stack
+# Vehicle Manager
 
-Implementação completa do desafio técnico com:
+Sistema full stack para gestão de veículos com autenticação, CRUD e upload de fotos.
 
-- Front-end: Vue 3 + Quasar + TypeScript + Pinia
-- Back-end: NestJS + Prisma + MySQL + JWT
-- Upload de fotos com `multipart/form-data`
+## Stack
+- Frontend: Vue 3 + Quasar + TypeScript + Pinia
+- Backend: NestJS + Prisma + MySQL + JWT
 
 ## Estrutura
+- `backend/` API NestJS
+- `view/` App Quasar
+- `docker-compose.yml` MySQL local via Docker
 
-- `view/` -> aplicação Quasar
-- `backend/` -> API NestJS
-
-## Funcionalidades implementadas
-
-- Login com validação de e-mail/senha e feedback de erro
-- Sessão com `accessToken` + `refreshToken`
-- Interceptor no front para renovar token expirado
-- Rotas privadas com guard
-- Logout com revogação de refresh token
+## Funcionalidades
+- Login e cadastro de conta (nome, e-mail e senha)
+- Sessão com access token + refresh token
+- Rotas privadas e logout
 - CRUD de veículos
-- Upload de múltiplas fotos (JPG/PNG/WEBP, até 5MB por arquivo)
-- Listagem em cards com:
-  - busca (marca/modelo) com debounce
-  - filtro por status
-  - ordenação
-  - paginação
-  - loading skeleton
-  - estado vazio
-- Página de detalhes com galeria/carrossel e modal de imagem
+- Upload de múltiplas fotos (`multipart/form-data`)
+- Listagem em cards com busca, filtro, ordenação e paginação
+- Página de detalhes com galeria de fotos
 
-## Back-end - como rodar
+---
 
-1. Entre em `backend/`:
-   - `cd backend`
-2. Instale dependências:
-   - `npm install`
-3. Copie variáveis:
-   - `cp .env.example .env` (ou equivalente no Windows)
-4. Suba MySQL local e ajuste `DATABASE_URL` no `.env`
-5. Gere client e rode migrations:
-   - `npm run prisma:generate`
-   - `npm run prisma:migrate`
-6. Inicie API:
-   - `npm run start:dev`
+## 1) Pre-requisitos
+- Node.js 20+ (recomendado)
+- npm 10+
+- Docker Desktop (opcional, para subir MySQL com mais facilidade)
 
-API disponível em `http://localhost:3000/api`
+---
 
-Usuário padrão (seed automático no boot):
+## 2) Subir banco MySQL
+
+### Opção A (recomendada): Docker
+Na raiz do projeto:
+
+```powershell
+docker compose up -d
+```
+
+Isso sobe:
+- host: `localhost`
+- porta: `3306`
+- database: `vehicle_manager`
+- user: `root`
+- password: `root`
+
+### Opção B: MySQL local
+Crie o banco manualmente:
+
+```sql
+CREATE DATABASE vehicle_manager CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+---
+
+## 3) Configurar e iniciar backend
+
+```powershell
+cd backend
+Copy-Item .env.example .env -Force
+```
+
+Confirme em `.env`:
+
+```env
+DATABASE_URL="mysql://root:root@localhost:3306/vehicle_manager"
+CORS_ORIGIN=http://localhost:9000
+```
+
+Instale as dependências, gere o Prisma e execute as migrações:
+
+```powershell
+npm install
+npx prisma generate
+npm run prisma:migrate
+```
+
+Inicie a API:
+
+```powershell
+npm run start:dev
+```
+
+API: `http://localhost:3000/api`
+
+Usuário admin padrão (criado automaticamente no boot):
 - e-mail: `admin@vehiclemanager.com`
 - senha: `admin123`
 
-## Front-end - como rodar
+---
 
-1. Entre em `view/`:
-   - `cd view`
-2. Instale dependências:
-   - `npm install`
-3. Copie variáveis:
-   - `cp .env.example .env` (ou equivalente no Windows)
-4. Inicie app:
-   - `npm run dev`
+## 4) Configurar e iniciar frontend
 
-App disponível em `http://localhost:9000` (porta padrão do Quasar dev).
+Em outro terminal:
 
-## Decisões técnicas
+```powershell
+cd view
+Copy-Item .env.example .env -Force
+npm install
+npm run dev
+```
 
-- Separação por módulos no NestJS (`auth`, `users`, `vehicles`).
-- Prisma para persistência e modelagem de domínio.
-- Refresh token persistido e revogado no banco para logout seguro.
-- Pinia para estado de autenticação e listagem.
-- Componentização de UI com `VehicleCard`.
-- Upload com validações no backend e preview no frontend.
+App: `http://localhost:9000`
 
-## Diferenciais já entregues
+Variáveis esperadas no `view/.env`:
 
-- Refresh token
-- Persistência de sessão
-- Tratamento de token expirado com interceptor
-- Paginação server-side
-- Skeleton loading
+```env
+VITE_API_URL=http://localhost:3000/api
+VITE_UPLOADS_URL=http://localhost:3000
+```
 
-## Próximos incrementos sugeridos
+---
 
-- Testes automatizados (Jest no backend e Vitest/Cypress no frontend)
-- Docker Compose (API + MySQL + Redis)
-- Controle de permissões por perfil
-- CI/CD + deploy
+## 5) Fluxo de uso rápido
+1. Acesse `http://localhost:9000/#/login`
+2. Clique em `Criar conta` para registrar um novo usuário
+3. Ou entre com o admin padrão
+4. Acesse `/vehicles` para listar/cadastrar/editar/excluir
+
+---
+
+## 6) Comandos úteis
+
+### Backend
+```powershell
+cd backend
+npm run -s lint
+npx tsc --noEmit --incremental false
+```
+
+### Frontend
+```powershell
+cd view
+npm run -s lint
+npx vue-tsc --noEmit
+```
+
+---
+
+## 7) Troubleshooting
+
+- Erro de conexão com banco:
+  - verifique se o MySQL está ativo na porta `3306`
+  - valide usuário/senha no `backend/.env`
+
+- Erro de Prisma migration:
+  - rode `npx prisma generate`
+  - depois `npm run prisma:migrate`
+
+- Tela branca no frontend:
+  - reinicie `npm run dev`
+  - confira `view/.env` apontando para `http://localhost:3000/api`
