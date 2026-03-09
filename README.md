@@ -152,10 +152,3 @@ npx vue-tsc --noEmit
   - verifique se o MySQL está ativo na porta `3306`
   - valide usuário/senha no `backend/.env`
 
-- Erro de Prisma migration:
-  - rode `npx prisma generate`
-  - depois `npm run prisma:migrate`
-
-- Tela branca no frontend:
-  - reinicie `npm run dev`
-  - confira `view/.env` apontando para `http://localhost:3000/api`
