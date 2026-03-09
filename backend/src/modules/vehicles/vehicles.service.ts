@@ -1,9 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { CreateVehicleDto } from './dtos/create-vehicle.dto';
 import { UpdateVehicleDto } from './dtos/update-vehicle.dto';
 import { VehicleQueryDto } from './dtos/vehicle-query.dto';
 import { VehiclesRepository } from './vehicles.repository';
-import { Prisma } from '@prisma/client';
+
+type VehicleOutput = {
+  value: Prisma.Decimal | number | string;
+  photos?: unknown[];
+  [key: string]: unknown;
+};
 
 @Injectable()
 export class VehiclesService {
@@ -30,7 +36,7 @@ export class VehiclesService {
         })),
       },
     });
-    return created;
+    return this.serializeVehicle(created);
   }
 
   async findAll(query: VehicleQueryDto) {
@@ -60,7 +66,7 @@ export class VehiclesService {
     ]);
 
     return {
-      items,
+      items: items.map((item) => this.serializeVehicle(item)),
       meta: {
         page: query.page,
         limit: query.limit,
@@ -73,9 +79,9 @@ export class VehiclesService {
   async findOne(id: string) {
     const vehicle = await this.vehiclesRepository.findById(id);
     if (!vehicle) {
-      throw new NotFoundException('Veículo não encontrado');
+      throw new NotFoundException('Veiculo nao encontrado');
     }
-    return vehicle;
+    return this.serializeVehicle(vehicle);
   }
 
   async update(
@@ -89,7 +95,7 @@ export class VehiclesService {
       await this.vehiclesRepository.deletePhotos(removedPhotoIds);
     }
 
-    return this.vehiclesRepository.update(id, {
+    const updated = await this.vehiclesRepository.update(id, {
       ...data,
       photos: photos.length
         ? {
@@ -103,11 +109,21 @@ export class VehiclesService {
           }
         : undefined,
     });
+
+    return this.serializeVehicle(updated);
   }
 
   async remove(id: string) {
     await this.findOne(id);
     await this.vehiclesRepository.delete(id);
-    return { message: 'Veículo removido com sucesso' };
+    return { message: 'Veiculo removido com sucesso' };
+  }
+
+  private serializeVehicle(vehicle: VehicleOutput) {
+    return {
+      ...vehicle,
+      value: Number(vehicle.value),
+      photos: vehicle.photos ?? [],
+    };
   }
 }

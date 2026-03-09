@@ -171,8 +171,16 @@ watch(newPhotos, (files) => {
 });
 
 function onValueInput(value: string | number | null) {
-  const raw = String(value ?? '').replace(/[^\d,]/g, '').replace(',', '.');
-  form.value.value = Number(raw || 0);
+  const digits = String(value ?? '').replace(/\D/g, '');
+  if (!digits) {
+    formattedValue.value = '';
+    form.value.value = 0;
+    return;
+  }
+
+  const amount = Number(digits) / 100;
+  form.value.value = amount;
+  formattedValue.value = formatMoney(amount);
 }
 
 function formatMoney(value: number) {
@@ -236,18 +244,30 @@ function buildPayload() {
 async function submitForm() {
   saving.value = true;
   error.value = '';
+  const payload = buildPayload();
+
   try {
-    const payload = buildPayload();
     if (isEdit.value && typeof route.params.id === 'string') {
       await updateVehicle(route.params.id, payload);
-      $q.notify({ type: 'positive', message: 'Veículo atualizado com sucesso' });
+      $q.notify({ type: 'positive', message: 'Veiculo atualizado com sucesso' });
     } else {
       await createVehicle(payload);
-      $q.notify({ type: 'positive', message: 'Veículo cadastrado com sucesso' });
+      $q.notify({ type: 'positive', message: 'Veiculo cadastrado com sucesso' });
     }
+  } catch (err) {
+    console.error('Erro ao salvar veiculo:', err);
+    error.value =
+      'Nao foi possivel salvar o veiculo. Verifique os dados e tente novamente.';
+    saving.value = false;
+    return;
+  }
+
+  try {
     await router.push('/vehicles');
-  } catch {
-    error.value = 'Não foi possível salvar o veículo. Verifique os dados e tente novamente.';
+  } catch (err) {
+    console.error('Erro ao navegar para listagem:', err);
+    error.value =
+      'Veiculo salvo, mas nao foi possivel redirecionar automaticamente.';
   } finally {
     saving.value = false;
   }
@@ -264,3 +284,4 @@ onMounted(async () => {
   await loadVehicle();
 });
 </script>
+

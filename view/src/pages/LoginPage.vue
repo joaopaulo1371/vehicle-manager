@@ -100,6 +100,9 @@ function goRegister() {
 
 <style scoped>
 .login-page {
+  min-height: 100vh;
+  width: 100%;
+  padding: 16px;
   background: linear-gradient(150deg, #e7f0ff 0%, #f7fbff 40%, #fff6ec 100%);
 }
 

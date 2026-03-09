@@ -22,6 +22,14 @@ Sistema full stack para gestão de veículos com autenticação, CRUD e upload d
 
 ---
 
+## Credenciais iniciais
+- Admin (criado automaticamente no boot do backend):
+  - e-mail: `admin@vehiclemanager.com`
+  - senha: `admin123`
+- Você pode alterar essas credenciais via `DEFAULT_ADMIN_EMAIL` e `DEFAULT_ADMIN_PASSWORD` no `backend/.env`.
+
+---
+
 ## 1) Pre-requisitos
 - Node.js 20+ (recomendado)
 - npm 10+

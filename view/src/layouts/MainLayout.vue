@@ -17,7 +17,7 @@
             <q-separator />
             <q-item clickable v-close-popup @click="handleLogout">
               <q-item-section avatar><q-icon name="logout" /></q-item-section>
-              <q-item-section>Logout</q-item-section>
+              <q-item-section>Sair</q-item-section>
             </q-item>
           </q-list>
         </q-btn-dropdown>
