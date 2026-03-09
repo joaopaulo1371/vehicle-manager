@@ -81,6 +81,8 @@ export const useAuthStore = defineStore('auth', () => {
       if (refreshToken.value) {
         await authService.logout(refreshToken.value);
       }
+    } catch {
+      // Logout deve limpar sessao local mesmo se API falhar.
     } finally {
       clearSession();
     }

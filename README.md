@@ -135,6 +135,7 @@ VITE_UPLOADS_URL=http://localhost:3000
 cd backend
 npm run -s lint
 npx tsc --noEmit --incremental false
+npx jest --runInBand
 ```
 
 ### Frontend
@@ -142,11 +143,43 @@ npx tsc --noEmit --incremental false
 cd view
 npm run -s lint
 npx vue-tsc --noEmit
+npm test
 ```
 
 ---
 
-## 7) Troubleshooting
+## 7) Testes
+
+Atualmente existem testes unitários no backend e no frontend.
+
+Executar todos os testes do backend:
+
+```powershell
+cd backend
+npx jest --runInBand
+```
+
+Arquivos de teste principais:
+- `src/modules/auth/auth.service.spec.ts`
+- `src/modules/vehicles/vehicles.service.spec.ts`
+
+Executar testes do frontend:
+
+```powershell
+cd view
+npm test
+```
+
+Arquivos de teste principais (frontend):
+- `test/auth-store.spec.ts`
+- `test/vehicle-service.spec.ts`
+
+Observação:
+- O frontend usa Vitest com ambiente `jsdom`.
+
+---
+
+## 8) Troubleshooting
 
 - Erro de conexão com banco:
   - verifique se o MySQL está ativo na porta `3306`
